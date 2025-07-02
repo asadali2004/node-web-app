@@ -17,7 +17,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh "docker build -t $IMAGE_NAME:${BUILD_NUMBER} ."
+                    bat """docker build -t %IMAGE_NAME%:%BUILD_NUMBER% ."""
                 }
             }
         }
@@ -25,19 +25,18 @@ pipeline {
         stage('Stop and Remove Old Container') {
             steps {
                 script {
-                    sh "docker stop $CONTAINER_NAME || true"
-                    sh "docker rm $CONTAINER_NAME || true"
+                    bat """docker stop %CONTAINER_NAME% || echo Container not running"""
+                    bat """docker rm %CONTAINER_NAME% || echo Container not found"""
                 }
             }
         }
 
         stage('Run New Container') {
-    steps {
-        script {
-            sh "docker run -d --name $CONTAINER_NAME -p 8081:$PORT $IMAGE_NAME:${BUILD_NUMBER}"
+            steps {
+                script {
+                    bat """docker run -d --name %CONTAINER_NAME% -p 8081:%PORT% %IMAGE_NAME%:%BUILD_NUMBER%"""
+                }
+            }
         }
-    }
-}
-
     }
 }
